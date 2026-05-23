@@ -1,10 +1,22 @@
 # Bluespeed
 
-> **[PLACEHOLDER: 2-3 sentences from Jorge — what is this and who is it for?]**
+- We're going to use frontier models to build the best local-first homelab experience
+- YOU DON'T NEED A HOMELAB, you can run this on your laptop or machine and have the same benefits. 
+- By driving bluespeed with `just` we can make deterministic workflows - this means, the entire thing can be manually driven by just. So you never need AI. If you use AI you'll just go faster. And since everything will be as automated and declerative as we can make it means you can use your own local model to drive you automation.
+- We basically want Star Trek + Jarvis. But local first. 
 
-Bluespeed is a **CNCF-native homelab factory**. Clone this repo, run `just setup`, and get a fully reproducible homelab stack on your own bare-metal hardware — the same one the Project Bluefin team runs.
+Bluespeed is a **homelab factory**. Clone this repo, run `just setup`, and get a fully reproducible homelab stack on your own bare-metal hardware — the same one the Project Bluefin team runs. Every tool in the stack is a CNCF project. No custom services where a CNCF tool exists. Everything is reproducible by any Bluefin contributor on their own hardware. 
 
-Every tool in the stack is a CNCF project. No custom services where a CNCF tool exists. Everything is reproducible by any Bluefin contributor on their own hardware.
+### The first use case is Bluefin Development
+
+- Fully automate Bluefin development.
+  - Generalize Jorge's lab
+- Build the MVP for Bluespeed which is knuckle + k0s + kubestellar
+- Use hive and our agents to build and test everything.
+
+### And then make justfiles so people without AI can help test Bluefin
+
+- Users can opt in to ujust device 2.0 to send info back for us to fix!
 
 ---
 
