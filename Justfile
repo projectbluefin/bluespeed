@@ -9,7 +9,7 @@ default:
 
 # Deploy full observability stack to a central node
 # Usage: just setup-otel HOST=jorge@192.168.1.102
-setup-otel HOST="jorge@192.168.1.102":
+setup-otel HOST:
     @echo "→ Deploying OTel observability stack to {{HOST}}..."
     bash otel/deploy.sh {{HOST}}
 
@@ -20,7 +20,7 @@ setup-otel-agent HOST:
     bash otel/deploy-agent.sh {{HOST}}
 
 # Check observability stack status on the central node
-otel-status HOST="jorge@192.168.1.102":
+otel-status HOST:
     #!/usr/bin/env bash
     IP=$(echo "{{HOST}}" | cut -d@ -f2)
     echo "=== Loki ==="
@@ -33,11 +33,11 @@ otel-status HOST="jorge@192.168.1.102":
     curl -sf "http://${IP}:8082/api/v1/health" && echo " ✅" || echo " ❌ not ready"
 
 # Tail logs from observability stack on central node
-otel-logs HOST="jorge@192.168.1.102":
+otel-logs HOST:
     ssh {{HOST}} "journalctl --user -f -u loki -u prometheus -u otelcol -u perses"
 
 # Stop and remove observability stack
-otel-teardown HOST="jorge@192.168.1.102":
+otel-teardown HOST:
     ssh {{HOST}} "systemctl --user stop loki prometheus otelcol perses 2>/dev/null || true && \
                   systemctl --user disable loki prometheus otelcol perses 2>/dev/null || true"
     @echo "✓ Observability stack stopped on {{HOST}}"
@@ -45,8 +45,8 @@ otel-teardown HOST="jorge@192.168.1.102":
 # ── Full Stack ────────────────────────────────────────────────────────────────
 
 # Deploy everything: central node stack + agent on a second node
-# Usage: just setup CENTRAL=jorge@192.168.1.102 NODE=jorge@192.168.1.247
-setup CENTRAL="jorge@192.168.1.102" NODE="jorge@192.168.1.247":
+# Usage: just setup CENTRAL=user@your-central-node NODE=user@your-node
+setup CENTRAL NODE:
     just setup-otel HOST={{CENTRAL}}
     just setup-otel-agent HOST={{NODE}}
     #!/usr/bin/env bash

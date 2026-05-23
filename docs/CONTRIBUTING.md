@@ -6,6 +6,43 @@ Bluespeed is a CNCF-native homelab factory. Before proposing any new tool or ser
 
 If a CNCF tool exists — use it. Don't build custom. This is non-negotiable.
 
+## Hard Rules
+
+These are non-negotiable. PRs that violate them will be closed.
+
+### NO HELM
+
+Helm is not used anywhere in this project. No Helm charts, no helmfile, no Helm operator, no Helm-based install scripts. All workloads are deployed as raw Kubernetes manifests (`Deployment`, `ConfigMap`, `Service`, `PVC`, etc.) through the Bluespeed Raptor Control Center (KubeStellar WebUI). If an upstream project's official install method uses Helm, find the raw manifests or generate them once and commit them to the repo.
+
+### NO kubectl apply
+
+Contributors do not run `kubectl apply` directly. All workloads are deployed and managed through the **Bluespeed Raptor Control Center** (KubeStellar WebUI). Justfile recipes handle any cluster interaction that requires direct API access.
+
+### Deployment Surface
+
+The **Bluespeed Raptor Control Center** (KubeStellar WebUI) is the single deployment surface for all stack components. Install it immediately after k3s. Everything else goes through it.
+
+### k3s is the Kubernetes distribution
+
+k3s is the single source of truth. Do not reference k0s, k8s vanilla, or any other distribution. Install flags for a lean, CNCF-first setup:
+
+```bash
+--disable helm-controller
+--disable traefik
+--disable servicelb
+--disable metrics-server
+```
+
+On Fedora/Bluefin (SELinux enabled): also add `--selinux` and install the `k3s-selinux` package first.
+
+### HostPort, not NodePort
+
+k3s default NodePort range is 30000–32767. All bluespeed service ports (3100, 4317, 4318, 9090, 8082) are below that floor. Use `hostPort` in pod specs with `hostNetwork: true` for all services that need to be reachable at their standard ports on the host network.
+
+### Loki is not a CNCF project
+
+Loki is a Grafana Labs OSS project, not a CNCF project. It is included in the stack because it is the best-in-class OTel log storage and there is no CNCF equivalent. Do not describe it as "CNCF Incubating" in documentation.
+
 ## Setting Up Your Own Lab
 
 > **[PLACEHOLDER: hardware requirements, network setup, Flatcar install steps]**

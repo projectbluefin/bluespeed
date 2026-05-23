@@ -11,7 +11,7 @@ Bluespeed is a **homelab factory**. Clone this repo, run `just setup`, and get a
 
 - Fully automate Bluefin development.
   - Generalize Jorge's lab
-- Build the MVP for Bluespeed which is knuckle + k0s + kubestellar
+- Build the MVP for Bluespeed which is knuckle + k3s + kubestellar
 - Use hive and our agents to build and test everything.
 
 ### And then make justfiles so people without AI can help test Bluefin
@@ -44,9 +44,9 @@ All CNCF projects. All reproducible. All deployed with `just`.
 | [knuckle](https://github.com/projectbluefin/knuckle) | — | Flatcar TUI installer |
 | [OpenTelemetry Collector](https://opentelemetry.io/) | Incubating | Metrics + logs from every node |
 | [Prometheus](https://prometheus.io/) | Graduated | Metrics storage |
-| [Loki](https://grafana.com/oss/loki/) | Incubating | Log aggregation |
+| [Loki](https://grafana.com/oss/loki/) | Grafana Labs OSS | Log aggregation |
 | [Perses](https://perses.dev/) | Sandbox | Dashboards |
-| [KubeSteller](https://kubestellar.io/) | Sandbox | Multi-cluster management |
+| [KubeStellar](https://kubestellar.io/) | Sandbox | Multi-cluster management — **Raptor Control Center** |
 | [KubeVirt](https://kubevirt.io/) | Incubating | VM management |
 
 ---
