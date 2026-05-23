@@ -9,7 +9,7 @@ REMOTE_DIR="/var/home/jorge/bluespeed/otel"
 IP=$(echo "$HOST" | cut -d@ -f2)
 
 echo "→ Creating remote directories..."
-ssh "$HOST" "mkdir -p ${REMOTE_DIR}/config/perses ${REMOTE_DIR}/{loki-data,prometheus-data,perses-data}"
+ssh "$HOST" "mkdir -p ${REMOTE_DIR}/config/perses ${REMOTE_DIR}/{loki-data,prometheus-data,perses-data} && chmod 777 ${REMOTE_DIR}/{loki-data,prometheus-data,perses-data}"
 
 echo "→ Copying configs..."
 scp "${SCRIPT_DIR}/ghost/config/otelcol-config.yaml" "${HOST}:${REMOTE_DIR}/config/"
@@ -30,10 +30,10 @@ ssh "$HOST" "systemctl --user daemon-reload"
 
 echo "→ Starting services (in order)..."
 ssh "$HOST" "
-  systemctl --user enable --now loki.service && sleep 5
-  systemctl --user enable --now prometheus.service && sleep 5
-  systemctl --user enable --now otelcol.service && sleep 8
-  systemctl --user enable --now perses.service
+  systemctl --user start loki.service && sleep 5
+  systemctl --user start prometheus.service && sleep 5
+  systemctl --user start otelcol.service && sleep 8
+  systemctl --user start perses.service
 "
 
 echo "→ Waiting for services to be ready (30s)..."

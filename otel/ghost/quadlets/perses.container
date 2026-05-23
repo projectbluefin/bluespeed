@@ -3,7 +3,7 @@ Description=Perses — dashboards (CNCF Sandbox)
 After=network-online.target prometheus.service loki.service
 
 [Container]
-Image=ghcr.io/perses/perses:latest
+Image=docker.io/persesdev/perses:v0.53.1
 ContainerName=perses
 Network=observability.network
 Volume=%h/bluespeed/otel/perses-data:/perses/db:z

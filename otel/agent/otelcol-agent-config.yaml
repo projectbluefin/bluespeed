@@ -1,27 +1,36 @@
-# OpenTelemetry Collector — node agent
+# OpenTelemetry Collector — node agent (systemd user service, binary install)
 # CNCF Incubating — https://opentelemetry.io/
 #
-# Collects systemd journal logs and host metrics.
-# Forwards to the central aggregator on ghost (default: 192.168.1.102).
+# Runs directly on the host (not in a container) to access journalctl natively.
+# Required for immutable OS (bootc/ostree) where containers can't access journald.
 #
-# To use: update the otlp exporter endpoint to your central node IP.
+# Docs: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/journaldreceiver/README.md
+#       https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/hostmetricsreceiver/README.md
+#
+# Version: 0.152.1 (keep in sync with deploy-agent.sh OTELCOL_VERSION)
+# To update: change version in deploy-agent.sh and re-run ./deploy-agent.sh HOST
 
 receivers:
+  # Systemd journal logs — reads via journalctl (host binary, direct access)
+  # Docs: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/journaldreceiver/README.md
+  # No `directory` set — journalctl uses its default path (/var/log/journal or /run/log/journal)
   journald:
-    directory: /run/log/journal
     priority: info
     start_at: end
+    retry_on_failure:
+      enabled: true
 
+  # Host metrics — CPU, memory, disk, network, filesystem, load
+  # Docs: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/hostmetricsreceiver/README.md
   hostmetrics:
     collection_interval: 30s
-    root_path: /hostfs
     scrapers:
       cpu: {}
       memory: {}
       disk: {}
       filesystem:
         exclude_mount_points:
-          mount_points: [/dev, /proc, /sys, /run/k3s]
+          mount_points: [/dev, /proc, /sys]
           match_type: strict
       network: {}
       load: {}
@@ -29,14 +38,16 @@ receivers:
 processors:
   batch:
     timeout: 10s
+  # Detect hostname and OS from the host system
   resourcedetection:
     detectors: [system]
     system:
       hostname_sources: [os]
 
 exporters:
+  # Send to OTel Collector aggregator on ghost via OTLP gRPC
+  # Change this IP to your central node
   otlp:
-    # Change this to your central node IP
     endpoint: 192.168.1.102:4317
     tls:
       insecure: true

@@ -1,0 +1,15 @@
+[Unit]
+Description=OpenTelemetry Collector agent (CNCF Incubating)
+Documentation=https://opentelemetry.io/docs/collector/
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=%h/.local/bin/otelcol-contrib --config=%h/.config/otelcol/config.yaml
+Restart=on-failure
+RestartSec=10
+# Give it time to start and connect
+TimeoutStartSec=30
+
+[Install]
+WantedBy=default.target
