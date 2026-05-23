@@ -54,10 +54,15 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
             )
             for t in pending:
                 t.cancel()
+            await asyncio.gather(*pending, return_exceptions=True)
     except Exception as e:
         print(f"[kvnc-proxy] connection error: {e}")
     finally:
         writer.close()
+        try:
+            await writer.wait_closed()
+        except Exception:
+            pass
 
 
 async def main():
