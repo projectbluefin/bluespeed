@@ -73,6 +73,19 @@ just otel-logs HOST=...     # tail service logs
 5. Update the stack table in `README.md`
 6. Update `docs/CONTRIBUTING.md` with the new port
 
+## Your laptop in the fleet
+
+Your laptop is a **fleet member** — not a k8s node.
+
+bluespeed deliberately does not run k8s agents on contributor laptops. Instead:
+
+- Your laptop's OS is a **bootc image** built by the cluster (or built by the community and published to a registry)
+- OS updates happen via `bootc upgrade` — atomic, with automatic rollback if the new image fails to boot
+- You send observability data (metrics + logs) to ghost via a lightweight OTel Collector binary: `just setup-otel-agent HOST=localhost`
+- Your laptop shows up in the Ghost: Bluespeed dashboard as a fleet member once the OTel agent is running
+
+This design keeps cluster complexity constant regardless of how many contributors join — the cluster is always just ghost + knuckle-1. Your laptop never needs to know that k8s exists.
+
 ## Porting to New Hardware
 
 The stack is designed to be hardware-agnostic. To deploy on different hardware:

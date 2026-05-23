@@ -135,12 +135,28 @@ bluespeed/
 3. **Justfile-driven.** Every operation has a `just` recipe. No bespoke runbooks.
 4. **Contributor-ready.** Any Bluefin contributor can deploy this on their own hardware.
 5. **knuckle stays neutral.** Bluespeed bundles tagged knuckle releases as-is. Never patched.
+6. **Clients consume images, they don't run cluster workloads.** Contributor laptops are managed via `bootc` image updates — not enrolled as k8s nodes. The cluster builds the images; the laptops boot them. This eliminates per-client agent overhead, enables atomic OS rollbacks, and keeps cluster complexity constant regardless of how many contributors join the fleet.
 
 ---
 
 ## Status
 
-> **[PLACEHOLDER: what works today, what's in progress, roadmap]**
+**Working today on ghost:**
+- OTel observability stack (Loki · Prometheus · Perses · OTel Collector) — Podman Quadlets, migration to k3s in progress
+- k3s single-node cluster on knuckle-1 (Flatcar VM via KVM)
+- KubeStellar Console — Ghost: Bluespeed dashboard at `http://192.168.1.102:8090`
+- Argo Workflows + Argo Events — build pipeline at `https://192.168.1.102:2746`
+- Ghost: Bluespeed web panel at `http://192.168.1.102:8091`
+
+**In progress:**
+- OTel stack migration from Podman Quadlets → k3s
+- `bluespeed.local` local DNS
+- Custom Build dashboard (Argo Workflows + BlueBuild + Zot)
+
+**Planned:**
+- Exo fleet leaderboard panel
+- KubeVirt VM management
+- Node enrollment (`just setup-otel-agent HOST=...` already works)
 
 ---
 
