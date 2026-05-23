@@ -45,7 +45,6 @@ All CNCF projects. All reproducible. All deployed with `just`.
 | [OpenTelemetry Collector](https://opentelemetry.io/) | Incubating | Metrics + logs from every node |
 | [Prometheus](https://prometheus.io/) | Graduated | Metrics storage |
 | [Loki](https://grafana.com/oss/loki/) | Grafana Labs OSS | Log aggregation |
-| [Perses](https://perses.dev/) | Sandbox | Dashboards |
 | [KubeStellar](https://kubestellar.io/) | Sandbox | Multi-cluster management — **Ghost: Bluespeed dashboard** |
 | [KubeVirt](https://kubevirt.io/) | Incubating | VM management |
 
@@ -70,7 +69,6 @@ just setup-otel HOST=user@your-central-node
 just setup-otel-agent HOST=user@node-1
 just setup-otel-agent HOST=user@node-2
 
-# 5. Open Perses at http://your-central-node:8082
 ```
 
 ---
@@ -86,7 +84,6 @@ node-1 ──► OTel Collector (agent)
 node-2 ──► OTel Collector (agent) ──► OTel Collector (aggregator)
 node-N ──►                                       │
                                      ┌───────────┼───────────┐
-                                   Loki      Prometheus   Perses
                                   (logs)     (metrics)  (dashboards)
 ```
 
@@ -98,7 +95,6 @@ node-N ──►                                       │
 | 4317 | OTel Collector gRPC (OTLP) |
 | 4318 | OTel Collector HTTP (OTLP) |
 | 9090 | Prometheus |
-| 8082 | Perses |
 
 ### Deploy
 
@@ -118,7 +114,6 @@ bluespeed/
 ├── otel/                       # observability stack
 │   ├── ghost/
 │   │   ├── quadlets/           # Podman Quadlet definitions
-│   │   └── config/             # OTel, Loki, Prometheus, Perses configs
 │   ├── agent/                  # per-node OTel Collector agent
 │   ├── deploy.sh               # deploys central-node stack
 │   └── deploy-agent.sh         # deploys agent to a node
@@ -142,7 +137,6 @@ bluespeed/
 ## Status
 
 **Working today on ghost:**
-- OTel observability stack (Loki · Prometheus · Perses · OTel Collector) — Podman Quadlets, migration to k3s in progress
 - k3s single-node cluster on knuckle-1 (Flatcar VM via KVM)
 - KubeStellar Console — Ghost: Bluespeed dashboard at `http://192.168.1.102:8090`
 - Argo Workflows + Argo Events — build pipeline at `https://192.168.1.102:2746`
