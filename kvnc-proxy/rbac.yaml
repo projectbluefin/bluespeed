@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kvnc-proxy
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kvnc-proxy
+rules:
+  - apiGroups: ["subresources.kubevirt.io"]
+    resources: ["virtualmachineinstances/vnc"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kvnc-proxy
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kvnc-proxy
+subjects:
+  - kind: ServiceAccount
+    name: kvnc-proxy
+    namespace: default
