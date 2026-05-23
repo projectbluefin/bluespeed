@@ -16,8 +16,11 @@ receivers:
       memory: {}
       disk: {}
       filesystem:
-        exclude_mount_points:
-          mount_points: [/dev, /proc, /sys]
+        # Include only the mounts we care about — avoids OTel dedup issues
+        # when the same btrfs device (/dev/nvme0n1p3) is bind-mounted multiple
+        # times (/etc, /var, /var/home). Explicit include wins over exclude.
+        include_mount_points:
+          mount_points: [/var, /boot, /boot/efi]
           match_type: strict
       network: {}
       load: {}

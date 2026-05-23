@@ -38,6 +38,11 @@ exporters:
       insecure: true
 
 service:
+  # Bind internal metrics to 0.0.0.0 so Prometheus can scrape port 8888
+  # (default is localhost:8888, which is unreachable through Podman port publish)
+  telemetry:
+    metrics:
+      address: 0.0.0.0:8888
   pipelines:
     logs:
       receivers: [otlp]

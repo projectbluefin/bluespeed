@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# serve.sh — Deploy the Bluespeed Raptor Control Center dashboard
+# serve.sh — Deploy the Bluespeed Ghost: Bluespeed dashboard
 # Runs ON ghost (192.168.1.102) after files have been rsync'd here.
 #
 # Usage: bash serve.sh
@@ -13,7 +13,7 @@ cd "$SCRIPT_DIR"
 KUBECONFIG="${HOME}/.config/bluespeed/kubeconfig"
 K3S="/usr/local/bin/k3s"
 
-echo "🦖 Raptor Control Center — deploying dashboard"
+echo "🦖 Ghost: Bluespeed — deploying dashboard"
 echo "   Dir: $SCRIPT_DIR"
 echo ""
 
@@ -215,13 +215,13 @@ echo ""
 echo "→ Verifying..."
 HTTP_CODE=$(curl -sf -o /dev/null -w "%{http_code}" http://127.0.0.1:8091/ 2>/dev/null || echo "000")
 if [ "$HTTP_CODE" = "200" ]; then
-    TITLE_CHECK=$(curl -sf http://127.0.0.1:8091/ | grep -c 'Raptor Control Center' || true)
+    TITLE_CHECK=$(curl -sf http://127.0.0.1:8091/ | grep -c 'Ghost: Bluespeed' || true)
     if [ "${TITLE_CHECK}" -ge 1 ]; then
         echo ""
-        echo "✅ Raptor Control Center is live!"
+        echo "✅ Ghost: Bluespeed is live!"
         echo "   http://192.168.1.102:8091"
     else
-        echo "⚠ HTTP 200 but 'Raptor Control Center' not found in response"
+        echo "⚠ HTTP 200 but 'Ghost: Bluespeed' not found in response"
     fi
 else
     echo "❌ HTTP $HTTP_CODE — check: podman logs bluespeed-dashboard"
