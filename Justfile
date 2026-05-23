@@ -140,6 +140,32 @@ dashboard-restart HOST="jorge@192.168.1.102":
 dashboard-logs HOST="jorge@192.168.1.102":
     ssh {{HOST}} "podman logs -f bluespeed-dashboard"
 
+# ── Argo Workflows ───────────────────────────────────────────────────────────
+
+# Install Argo Workflows + Argo Events on knuckle-1 via k3s auto-deploy
+# Usage: just setup-argo HOST=core@192.168.122.227
+setup-argo HOST="core@192.168.122.227":
+    @echo "→ Installing Argo Workflows on {{HOST}}..."
+    bash argo/install.sh {{HOST}}
+
+# Check Argo Workflows + Events pod status
+argo-status HOST="core@192.168.122.227":
+    ssh jorge@192.168.1.102 "ssh {{HOST}} '/opt/bin/k3s kubectl get pods -n argo; echo; /opt/bin/k3s kubectl get pods -n argo-events'"
+
+# Open Argo Workflows UI (socat proxy on ghost → knuckle-1:32746)
+argo-ui:
+    @echo "Argo Workflows UI: https://192.168.1.102:2746"
+
+# Start/restart the socat proxy that forwards ghost:2746 → knuckle-1:32746
+argo-proxy-start:
+    ssh jorge@192.168.1.102 "systemctl --user enable --now argo-ui-proxy.service && systemctl --user is-active argo-ui-proxy.service"
+    @echo "✓ Argo UI proxy running: https://192.168.1.102:2746"
+
+# Stop the socat proxy
+argo-proxy-stop:
+    ssh jorge@192.168.1.102 "systemctl --user stop argo-ui-proxy.service"
+    @echo "✓ Argo UI proxy stopped"
+
 # ── Full Stack ────────────────────────────────────────────────────────────────
 
 # Deploy everything: central node stack + agent on a second node
