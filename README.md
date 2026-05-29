@@ -1,7 +1,7 @@
 # Bluespeed
 
 - We're going to use frontier models to build the best local-first homelab experience
-- YOU DON'T NEED A HOMELAB, you can run this on your laptop or machine and have the same benefits. 
+- YOU DON'T NEED A HOMELAB, you can run this on your laptop or machine and have the same benefits. See [Laptop Quickstart](docs/LAPTOP_QUICKSTART.md). 
 - By driving bluespeed with `just` we can make deterministic workflows - this means, the entire thing can be manually driven by just. So you never need AI. If you use AI you'll just go faster. And since everything will be as automated and declerative as we can make it means you can use your own local model to drive you automation.
 - We basically want Star Trek + Jarvis. But local first. 
 
