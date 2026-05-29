@@ -45,7 +45,38 @@ Loki is a Grafana Labs OSS project, not a CNCF project. It is included in the st
 
 ## Setting Up Your Own Lab
 
-> **[PLACEHOLDER: hardware requirements, network setup, Flatcar install steps]**
+### Hardware Requirements
+
+| Resource | Minimum | Recommended |
+|----------|---------|-------------|
+| CPU | 4 cores | 8+ cores |
+| RAM | 8 GB | 16 GB |
+| Disk | 20 GB free | 50 GB SSD |
+| OS | Linux (mutable or immutable) | Fedora/Bluefin (ostree) |
+
+### Laptop Quickstart (single-node, no homelab)
+
+Run the entire Bluespeed stack on your laptop — no remote machines needed:
+
+```bash
+# 1. Install k3s (standard Linux)
+curl -sfL https://get.k3s.io | sh -
+# Verify: kubectl get nodes
+
+# 2. For Bluefin / immutable ostree systems: layer k3s with rpm-ostree
+#    rpm-ostree install k3s k3s-selinux && systemctl reboot
+#    After reboot: sudo k3s server --selinux --disable traefik --disable servicelb
+
+# 3. Clone and deploy
+git clone https://github.com/projectbluefin/bluespeed
+cd bluespeed
+just setup-local
+
+# 4. Send your laptop's telemetry to the local stack
+just setup-otel-agent HOST=localhost
+```
+
+### Homelab Quickstart (multi-node, dedicated hardware)
 
 ```bash
 # Clone and deploy
