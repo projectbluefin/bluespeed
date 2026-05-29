@@ -45,10 +45,10 @@ Loki is a Grafana Labs OSS project, not a CNCF project. It is included in the st
 
 ## Setting Up Your Own Lab
 
-> **[PLACEHOLDER: hardware requirements, network setup, Flatcar install steps]**
+For a laptop-only setup (no remote nodes), see [docs/LAPTOP_QUICKSTART.md](docs/LAPTOP_QUICKSTART.md).
 
 ```bash
-# Clone and deploy
+# Clone and deploy (multi-node lab)
 git clone https://github.com/projectbluefin/bluespeed
 cd bluespeed
 just setup CENTRAL=user@your-central-node NODE=user@your-other-node
