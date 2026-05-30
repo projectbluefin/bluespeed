@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: perses
+  namespace: observability
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: perses
+  template:
+    metadata:
+      labels:
+        app: perses
+    spec:
+      hostNetwork: true
+      containers:
+        - name: perses
+          image: persesdev/perses:v0.49.0
+          ports:
+            - containerPort: 8080
+              hostPort: 8082
+              protocol: TCP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: perses-datasources
+  namespace: observability
+data:
+  datasources.yaml: |
+    kind: GlobalDatasource
+    metadata:
+      name: prometheus
+    spec:
+      default: true
+      plugin:
+        kind: Prometheus
+        spec:
+          directUrl: http://prometheus.observability.svc.cluster.local:9090
+  second-datasource.yaml: |
+    kind: GlobalDatasource
+    metadata:
+      name: loki
+    spec:
+      plugin:
+        kind: Loki
+        spec:
+          directUrl: http://loki.observability.svc.cluster.local:3100
