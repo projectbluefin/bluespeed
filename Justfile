@@ -474,3 +474,26 @@ systemctl --user daemon-reload
 systemctl --user enable --now socat-guacamole.service
 systemctl --user is-active socat-guacamole.service'
     echo "✓ ghost:30190 → 192.168.122.227:30190 forwarding active"
+
+# ── Fleet Node Management ────────────────────────────────────────────────────
+
+# Create a Flatcar VM for the bluespeed fleet
+# Usage: just create-vm exo2 HOST=jorge@192.168.1.100 RAM=16384 VCPUS=8 DISK=60G
+create-vm NAME HOST RAM="16384" VCPUS="8" DISK="60G":
+    @echo "→ Creating fleet node: {{NAME}}..."
+    bash vms/create-vm.sh "{{NAME}}" "{{HOST}}" "{{RAM}}" "{{VCPUS}}" "{{DISK}}"
+
+# Generate an ignition template for a new fleet node
+# Usage: just ignition-template exo2
+ignition-template NAME:
+    @mkdir -p vms/ignition
+    @echo "# Butane config for {{NAME}}" > vms/ignition/{{NAME}}.bu
+    @echo "variant: flatcar" >> vms/ignition/{{NAME}}.bu
+    @echo "version: 1.0.0" >> vms/ignition/{{NAME}}.bu
+    @echo "passwd:" >> vms/ignition/{{NAME}}.bu
+    @echo "  users:" >> vms/ignition/{{NAME}}.bu
+    @echo "    - name: core" >> vms/ignition/{{NAME}}.bu
+    @echo '      ssh_authorized_keys:' >> vms/ignition/{{NAME}}.bu
+    @echo '        - "ssh-ed25519 YOUR_KEY_HERE"' >> vms/ignition/{{NAME}}.bu
+    @echo "✓ Template created: vms/ignition/{{NAME}}.bu"
+    @echo "  Edit it, then run: just create-vm {{NAME}} HOST=user@ip"
