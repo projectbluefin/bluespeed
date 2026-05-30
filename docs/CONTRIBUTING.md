@@ -63,6 +63,27 @@ just otel-status HOST=...   # check stack health
 just otel-logs HOST=...     # tail service logs
 ```
 
+## Fast Build Cycles
+
+Image builds happen in [dakota](https://github.com/projectbluefin/dakota). The `chunkify` step (zstd-chunked metadata for bootc image-based updates) takes 15–30 minutes and is the single biggest time sink in the build→test cycle.
+
+To skip chunkify during local development on ghost or any dev machine, set the `BUILD_SKIP_CHUNKIFY` flag:
+
+```bash
+# In ~/.bashrc on dev/lab machines:
+export BUILD_SKIP_CHUNKIFY=1
+```
+
+This cuts local build→NUC-test cycles from ~45 min down to ~15 min.
+
+**When to use it:**
+- Local development on ghost — the NUC test only needs a correctly-built image, not a chunked one
+- Feature branches — chunkify is only needed when building production images for fleet deployment
+
+**When NOT to use it:**
+- Production builds intended for fleet rollout (bootc image-based updates require chunked metadata)
+- CI pipelines — always run chunkify in CI to validate the full build path
+
 ## Adding a New Stack Component
 
 1. Check [landscape.cncf.io](https://landscape.cncf.io/) — CNCF tool must exist
