@@ -474,3 +474,56 @@ systemctl --user daemon-reload
 systemctl --user enable --now socat-guacamole.service
 systemctl --user is-active socat-guacamole.service'
     echo "✓ ghost:30190 → 192.168.122.227:30190 forwarding active"
+
+# ── Cluster Health ──────────────────────────────────────────────────────────
+
+# Check ghost cluster health and report status per component
+# Usage: just cluster-status HOST=jorge@192.168.1.102
+# Returns exit code 1 if any component is unhealthy
+cluster-status HOST:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    IP=$(echo "{{HOST}}" | cut -d@ -f2)
+    FAILED=0
+
+    check() {
+        local label="$1" cmd="$2"
+        if eval "$cmd" &>/dev/null; then
+            echo "✅ ${label}"
+        else
+            echo "❌ ${label}"
+            FAILED=1
+        fi
+    }
+
+    echo "=== Ghost Cluster Health @ ${IP} ==="
+    echo ""
+
+    check "k3s node Ready" \
+        "ssh {{HOST}} 'sudo kubectl get node \$(hostname) --no-headers 2>/dev/null | grep -q Ready'"
+
+    check "KubeStellar WebUI (${IP}:9080)" \
+        "curl -sf --max-time 5 http://${IP}:9080/ > /dev/null"
+
+    check "local-path-provisioner SC" \
+        "ssh {{HOST}} 'sudo kubectl get sc local-path --no-headers 2>/dev/null | grep -q .'"
+
+    check "Loki (${IP}:3100)" \
+        "curl -sf --max-time 5 http://${IP}:3100/ready > /dev/null"
+
+    check "Prometheus (${IP}:9090)" \
+        "curl -sf --max-time 5 http://${IP}:9090/-/ready > /dev/null"
+
+    check "OTel Collector" \
+        "curl -sf --max-time 5 http://${IP}:8888/metrics | grep -q otelcol_process 2>/dev/null"
+
+    check "Perses (${IP}:8082)" \
+        "curl -sf --max-time 5 http://${IP}:8082/api/v1/health > /dev/null"
+
+    echo ""
+    if [[ $FAILED -eq 0 ]]; then
+        echo "✅ All checks passed."
+    else
+        echo "❌ Some checks failed. Inspect the components above."
+        exit 1
+    fi
