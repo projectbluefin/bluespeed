@@ -52,7 +52,9 @@ All CNCF projects. All reproducible. All deployed with `just`.
 
 ## Quick Start
 
-> **[PLACEHOLDER: Prerequisites — hardware, Flatcar install steps, network requirements]**
+**Laptop (single-node, no homelab):** see [Laptop Quickstart](docs/CONTRIBUTING.md#laptop-quickstart-single-node-no-homelab) in CONTRIBUTING.md.
+
+**Homelab (multi-node, dedicated hardware):**
 
 ```bash
 # 1. Install Flatcar on your hardware using knuckle
@@ -69,6 +71,12 @@ just setup-otel HOST=user@your-central-node
 just setup-otel-agent HOST=user@node-1
 just setup-otel-agent HOST=user@node-2
 
+```
+
+### Check cluster health
+
+```bash
+just cluster-status
 ```
 
 ---
