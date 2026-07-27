@@ -449,6 +449,41 @@ titan-reprovision-dakota:
     echo "→ Re-importing from 192.168.1.102:5000/dakota:latest..."
     just titan-create-dakota
 
+# Migrate observability from Podman Quadlets to k3s (cutover)
+# Prerequisites: just cluster-status must be all green with shadow ports validated
+# Usage: just migrate-cutover HOST=jorge@192.168.1.102
+migrate-cutover HOST:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "→ Cutting over observability stack from Podman Quadlets to k3s..."
+    echo ""
+    echo "Stopping Podman Quadlets..."
+    systemctl --user stop loki prometheus otelcol perses 2>/dev/null || true
+    sleep 2
+    echo "→ Changing k3s services to final ports..."
+    kubectl patch deployment loki -n observability --type=json -p='[{"op":"replace","path":"/spec/template/spec/containers/0/ports/0/hostPort","value":3100}]' 2>/dev/null
+    kubectl patch deployment prometheus -n observability --type=json -p='[{"op":"replace","path":"/spec/template/spec/containers/0/ports/0/hostPort","value":9090}]' 2>/dev/null
+    sleep 5
+    echo "→ Running cluster-status check..."
+    just cluster-status HOST={{HOST}} || {
+        echo "❌ cluster-status failed! Running rollback..."
+        just migrate-rollback HOST={{HOST}}
+        exit 1
+    }
+    echo ""
+    echo "✓ Cutover successful. Run 'systemctl --user disable loki prometheus otelcol perses' to complete decommission."
+
+# Rollback k3s migration — restore Podman Quadlets
+# Usage: just migrate-rollback HOST=jorge@192.168.1.102
+migrate-rollback HOST:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "→ Rolling back to Podman Quadlets..."
+    echo "→ Restarting Quadlets..."
+    systemctl --user restart loki prometheus otelcol perses 2>/dev/null || true
+    sleep 5
+    echo "✓ Rollback complete."
+
 # Add persistent socat forward on ghost for Guacamole (port 30190 → knuckle-1:30190)
 # Usage: just ghost-add-guac-forward
 ghost-add-guac-forward:
