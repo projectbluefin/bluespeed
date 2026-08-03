@@ -5,7 +5,64 @@
 default:
     @just --list
 
+# ── Local Laptop Setup ────────────────────────────────────────────────────────
+
+# Deploy the entire Bluespeed stack locally (no remote SSH needed)
+# Prereqs: k3s installed (curl -sfL https://get.k3s.io | sh -), just installed
+# Usage: just setup-local
+setup-local:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "→ Deploying Bluespeed locally (single-node k3s)..."
+    # Verify k3s is running
+    if ! kubectl get nodes &>/dev/null; then
+        echo "k3s not found. Install with: curl -sfL https://get.k3s.io | sh -"
+        exit 1
+    fi
+    echo "  ✓ k3s cluster detected"
+    # OTel stack
+    echo "→ Deploying observability stack (OTel collector + Loki + Prometheus + Perses)..."
+    bash otel/deploy.sh localhost
+    echo ""
+    echo "✅ Bluespeed deployed locally."
+    echo "  Perses (dashboards): http://localhost:8082"
+    echo "  OTel (metrics/logs): http://localhost:4318"
+    echo ""
+    echo "  Next: just setup-otel-agent HOST=localhost  (sends your laptop telemetry)"
+
 # ── Observability Stack ───────────────────────────────────────────────────────
+
+# Check the health of all stack components on ghost and knuckle-1
+# Usage: just cluster-status
+cluster-status:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    GHOST=jorge@192.168.1.102
+    KNUCKLE1=core@192.168.122.227
+    GHOST_IP=192.168.1.102
+    KBC="sudo kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml"
+    echo "=== Bluespeed Cluster Health ==="
+    echo ""
+    echo "--- Ghost ---"
+    echo -n "  Loki (3100):          "; curl -sf --max-time 3 "http://${GHOST_IP}:3100/ready" > /dev/null && echo "✅" || echo "❌"
+    echo -n "  Prometheus (9090):    "; curl -sf --max-time 3 "http://${GHOST_IP}:9090/-/ready" > /dev/null && echo "✅" || echo "❌"
+    echo -n "  Perses (8082):        "; curl -sf --max-time 3 "http://${GHOST_IP}:8082/api/v1/health" > /dev/null && echo "✅" || echo "❌"
+    echo -n "  KubeStellar (8090):   "; curl -sfk --max-time 3 "https://${GHOST_IP}:8090/" > /dev/null && echo "✅ (TLS)" || echo "❌"
+    echo -n "  Dashboard (8091):     "; curl -sf --max-time 3 "http://${GHOST_IP}:8091/" > /dev/null && echo "✅" || echo "❌"
+    echo -n "  Guacamole (30190):    "; curl -sf --max-time 3 "http://${GHOST_IP}:30190/guacamole/" > /dev/null && echo "✅" || echo "❌"
+    echo -n "  Argo UI (2746):       "; curl -sfk --max-time 3 "https://${GHOST_IP}:2746/" > /dev/null && echo "✅ (TLS)" || echo "❌"
+    echo -n "  OTel agent units:     "; ssh ${GHOST} "systemctl --user is-active loki prometheus otelcol perses 2>/dev/null | paste -sd ' '" 2>/dev/null || echo "ssh failed"
+    echo ""
+    echo "--- knuckle-1 ---"
+    echo -n "  k3s nodes:           "; ssh ${GHOST} "ssh ${KNUCKLE1} '${KBC} get nodes --no-headers | wc -l'" 2>/dev/null | tr -d ' ' || echo "ssh failed"
+    echo -n "  k3s pods:            "; ssh ${GHOST} "ssh ${KNUCKLE1} '${KBC} get pods -A --no-headers 2>/dev/null | grep -c Running'" 2>/dev/null | tr -d ' ' || echo "ssh failed"
+    echo -n "  KubeVirt (pods):     "; ssh ${GHOST} "ssh ${KNUCKLE1} '${KBC} get pods -n kubevirt --no-headers 2>/dev/null | grep -c Running'" 2>/dev/null | tr -d ' ' || echo "ssh failed"
+    echo -n "  Argo (pods):         "; ssh ${GHOST} "ssh ${KNUCKLE1} '${KBC} get pods -n argo --no-headers 2>/dev/null | grep -c Running'" 2>/dev/null | tr -d ' ' || echo "ssh failed"
+    echo -n "  Titan VMs:           "; ssh ${GHOST} "ssh ${KNUCKLE1} '${KBC} get vm -A --no-headers 2>/dev/null | grep -c true || echo 0'" 2>/dev/null | tr -d ' 
+' || echo "ssh failed"
+    echo ""
+    echo "Done. Dashboard: http://${GHOST_IP}:8091"
+
 
 # Deploy full observability stack to a central node
 # Usage: just setup-otel HOST=jorge@192.168.1.102
