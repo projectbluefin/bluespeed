@@ -3,7 +3,7 @@ Description=Prometheus — metrics storage (CNCF Graduated)
 After=network-online.target observability-network.service
 
 [Container]
-Image=docker.io/prom/prometheus:v3.13.2
+Image=docker.io/prom/prometheus:v3.13.2@sha256:508729e0e2d18e11fd742a5a5ca70e557b940a93948c3c95fd0123a6fd538b69
 ContainerName=prometheus
 Network=observability.network
 Volume=%h/bluespeed/otel/prometheus-data:/prometheus:z
