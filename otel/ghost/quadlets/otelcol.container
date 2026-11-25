@@ -3,7 +3,7 @@ Description=OpenTelemetry Collector — aggregator (CNCF Incubating)
 After=network-online.target loki.service prometheus.service
 
 [Container]
-Image=docker.io/otel/opentelemetry-collector-contrib:0.163.2@sha256:7f22d2a6748110ffb6a59bc0df448bccbf501cdb667d610ede4c61d3863d5849
+Image=docker.io/otel/opentelemetry-collector-contrib:0.166.0@sha256:3e18fe04181de50bdd72e23ad4a4d6214b54351e63d496f1c58127cc4541ad7f
 ContainerName=otelcol
 Network=observability.network
 Volume=%h/bluespeed/otel/config/otelcol-config.yaml:/etc/otelcol-contrib/config.yaml:ro,z
