@@ -3,7 +3,7 @@ Description=Loki — log aggregation (CNCF Incubating)
 After=network-online.target observability-network.service
 
 [Container]
-Image=docker.io/grafana/loki:3.7.9@sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28
+Image=docker.io/grafana/loki:3.7.11@sha256:4c86f2ad5003304c8da84d29da2279b04eb999d716f8089c88e4fa4a44b0781e
 ContainerName=loki
 Network=observability.network
 Volume=%h/bluespeed/otel/loki-data:/loki:z
